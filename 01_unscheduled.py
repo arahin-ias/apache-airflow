@@ -27,3 +27,16 @@ def _calculate_stats(input_path, output_path):
     stats = events.groupby(['date', 'user']).size().reset_index()
     Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
+
+
+calculate_stats = PythonOperator(
+    task_id="calculate_stats",
+    python_callable=_calculate_stats,
+    op_kwargs={
+        "input_path": "/home/airflow/airflow_output/data/events.json",
+        "output_path": "/home/airflow/airflow_output/data/stats.csv",
+    },
+    dag=dag,
+)
+
+fetch_events >> calculate_stats
