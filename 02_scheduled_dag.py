@@ -10,7 +10,8 @@ from airflow import DAG
 dag = DAG(
     dag_id="02_scheduled_dag",
     schedule_interval="@daily",
-    start_date=dt.datetime(2019, 1, 1),
+    start_date=dt.datetime(year=2019, month=1, day=1),
+    end_date=dt.datetime(year=2019, month=1, day=5),
 )
 
 fetch_events = BashOperator(
@@ -21,6 +22,7 @@ fetch_events = BashOperator(
     ),
     dag=dag,
 )
+
 
 def _calculate_stats(input_path, output_path):
     events = pd.read_json(input_path)
