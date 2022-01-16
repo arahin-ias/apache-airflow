@@ -13,13 +13,14 @@ dag = DAG(
     start_date=dt.datetime(2019, 1, 1),
 )
 
-fetch_event = BashOperator(
+fetch_events = BashOperator(
     task_id="fetch_event",
-    bash_command="curl mkdir -p /home/airflow/airflow_data/data/ && curl -0 /home/airflow/airflow_data/data/events.json"
-                 " http://localhost:5000/events ",
-    dag=dag
+    bash_command=(
+        "mkdir -p /home/airflow/airflow_output/data_02 && curl -o /home/airflow/airflow_output/data_02/events.json "
+        "http://localhost:5000/events "
+    ),
+    dag=dag,
 )
-
 
 def _calculate_stats(input_path, output_path):
     events = pd.read_json(input_path)
@@ -32,10 +33,10 @@ calculate_stats = PythonOperator(
     task_id="calculate_stats",
     python_callable=_calculate_stats,
     op_kwargs={
-        "input_path": "/home/airflow/airflow_output/data/events.json",
-        "output_path": "/home/airflow/airflow_output/data/stats.csv",
+        "input_path": "/home/airflow/airflow_output/data_02/events.json",
+        "output_path": "/home/airflow/airflow_output/data_02/stats.csv",
     },
     dag=dag,
 )
 
-fetch_event >> calculate_stats
+fetch_events >> calculate_stats
