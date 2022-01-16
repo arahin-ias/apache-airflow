@@ -16,7 +16,7 @@ fetch_events = BashOperator(
     task_id="fetch_event",
     bash_command=(
         "mkdir -p /home/airflow/airflow_output/data && curl -o /home/airflow/airflow_output/data/events.json "
-        "https://localhost:5000/events"
+        "http://localhost:5000/events "
     ),
     dag=dag,
 )
