@@ -5,7 +5,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 dag = DAG(
-    dag_id="listing_4_05",
+    dag_id="stocksense",
     start_date=airflow.utils.dates.days_ago(1),
     schedule_interval="@hourly",
 )
