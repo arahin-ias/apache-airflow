@@ -11,7 +11,7 @@ dag = DAG(
 get_data = BashOperator(
     task_id="get_data",
     bash_command=(
-        "curl -o /tmp/wikipageviews.gz "
+        "curl -o /home/airflow/airflow_output/wikipedia/wikipageviews.gz "
         "https://dumps.wikimedia.org/other/pageviews/"
         "{{ execution_date.year }}/"
         "{{ execution_date.year }}-{{ '{:02}'.format(execution_date.month) }}/"
