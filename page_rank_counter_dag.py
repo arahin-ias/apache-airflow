@@ -4,7 +4,7 @@ from airflow.operators.bash import BashOperator
 from airflow import DAG
 
 dag = DAG(
-    dag_id="user_define_callable",
+    dag_id="page_rank_counter",
     start_date=airflow.utils.dates.days_ago(3),
     schedule_interval="@hourly",
 )
