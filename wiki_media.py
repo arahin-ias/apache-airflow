@@ -22,5 +22,3 @@ get_data = BashOperator(
     ),
     dag=dag,
 )
-
-get_data
