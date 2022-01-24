@@ -20,3 +20,9 @@ clean_weather = DummyOperator(task_id="clean_weather", dag=dag)
 join_datasets = DummyOperator(task_id="join_datasets", dag=dag)
 train_model = DummyOperator(task_id="train_model", dag=dag)
 deploy_model = DummyOperator(task_id="deploy_model", dag=dag)
+
+start >> [fetch_sales, fetch_weather]
+fetch_sales >> clean_sales
+fetch_weather >> clean_weather
+[clean_sales, clean_weather] >> join_datasets
+join_datasets >> train_model >> deploy_model
