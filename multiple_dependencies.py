@@ -9,16 +9,14 @@ dag = DAG(
     schedule_interval='@daily',
 )
 
-start = DummyOperator(
-    task_id='start',
-    dag=dag,
-)
+start = DummyOperator(task_id="start", dag=dag)
 
-fetch_sales = DummyOperator(
-    task_id='fetch_sales',
-    dag=dag,
-)
-clean_sales = DummyOperator(
-    task_id='clean_sales',
-    dag=dag,
-)
+fetch_sales = DummyOperator(task_id="fetch_sales", dag=dag)
+clean_sales = DummyOperator(task_id="clean_sales", dag=dag)
+
+fetch_weather = DummyOperator(task_id="fetch_weather", dag=dag)
+clean_weather = DummyOperator(task_id="clean_weather", dag=dag)
+
+join_datasets = DummyOperator(task_id="join_datasets", dag=dag)
+train_model = DummyOperator(task_id="train_model", dag=dag)
+deploy_model = DummyOperator(task_id="deploy_model", dag=dag)
