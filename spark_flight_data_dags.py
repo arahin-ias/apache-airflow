@@ -20,7 +20,7 @@ build_jar = BashOperator(
 
 submit_spark_job = BashOperator(
     task_id='submit_spark_job',
-    bash_command='spark-submit --class org.flight.analysis.FlightDelaysAndCancellations '
+    bash_command='spark-submit --class org.flight.analysis.FlightDataProcessor '
                  '--master spark://ubuntu:7077 '
                  '--deploy-mode cluster '
                  '--executor-memory 16G '
