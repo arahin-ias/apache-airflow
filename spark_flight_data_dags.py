@@ -20,9 +20,14 @@ build_jar = BashOperator(
 
 submit_spark_job = BashOperator(
     task_id='submit_spark_job',
-    bash_command='spark-submit --class org.flight.analysis.FlightDelaysAndCancellations --master spark://ubuntu:7077 '
-                 '--deploy-mode cluster --executor-memory 16G --total-executor-cores 12 --driver-memory 16G '
-                 '--driver-cores 12 ~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
+    bash_command='spark-submit --class org.flight.analysis.FlightDelaysAndCancellations '
+                 '--master spark://ubuntu:7077 '
+                 '--deploy-mode cluster '
+                 '--executor-memory 16G '
+                 '--total-executor-cores 12 '
+                 '--driver-memory 16G '
+                 '--driver-cores 12 '
+                 '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
                  '-data-analysis-1.0-SNAPSHOT.jar '
                  '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
 )
