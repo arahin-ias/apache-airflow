@@ -29,7 +29,8 @@ submit_spark_job = BashOperator(
                  '--driver-cores 12 '
                  '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
                  '-data-analysis-1.0-SNAPSHOT.jar '
-                 '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
+                 '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ ',
+    dag=dag,
 )
 
 build_jar >> submit_spark_job
