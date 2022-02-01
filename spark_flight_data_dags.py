@@ -29,7 +29,8 @@ submit_spark_job = BashOperator(
                  '--driver-cores 12 '
                  '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
                  '-data-analysis-1.0-SNAPSHOT.jar '
-                 '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ ',
+                 '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
+                 '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data 4',
     dag=dag,
 )
 
