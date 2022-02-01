@@ -12,4 +12,9 @@ dag = DAG(
     schedule_interval="@hourly",
 )
 
+build_jar = BashOperator(
+    task_id='build_spark_jar',
+    bash_command='mvn clean install -f ~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
+    dag=dag,
+)
 
