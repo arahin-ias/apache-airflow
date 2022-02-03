@@ -20,18 +20,6 @@ build_jar = BashOperator(
     dag=dag,
 )
 
-# wait_for_jar_to_build = FileSensor(
-#     task_id='wait_for_jar_to_build',
-#     file_path='~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/'
-#               'spark-flights-data-analysis-1.0-SNAPSHOT.jar',
-#     dag=dag
-# )
-#
-# jar_join_dummy_task = DummyOperator(
-#     task_id='jar_join_dummy_task',
-#     dag=dag,
-# )
-
 
 def run_all_spark_job():
     for job_id in range(1, 7):
