@@ -3,11 +3,8 @@ import os
 import tarfile
 from pathlib import Path
 
-file_path = '/home/rahin/source-code/Intellij-Project/' \
-            'Spark-Flights-Data-Analysis/filter_data/find_total_distance_flown'
-root_file_dir = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
-
-output_dir = '/home/rahin/output/'
+SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
+DESTINATION_DIRECTORY = '/home/rahin/output/'
 
 
 def make_tarfile(output_filename, source_dir):
@@ -40,11 +37,12 @@ def find_success_files_parent(success_file_directory):
     return success_files_parents
 
 
-all_files = find_all_files(root_dir=root_file_dir)
+all_files = find_all_files(root_dir=SOURCE_DIRECTORY)
 
 all_success_file_dir = filter_all_success_directory(all_files)
 
 success_files_parents = find_success_files_parent(all_success_file_dir)
 
 for f in success_files_parents:
-    make_tarfile(output_dir + os.path.basename(f) + '.tar', output_dir)
+    make_tarfile(output_filename=DESTINATION_DIRECTORY + os.path.basename(f) + '.tar',
+                 source_dir=SOURCE_DIRECTORY)
