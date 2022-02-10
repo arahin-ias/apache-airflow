@@ -20,9 +20,11 @@ filename = '/home/rahin/output/first.tar'
 file_obj = tarfile.open(filename, 'w')
 
 list_files_in_dir = os.listdir(
-    '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/find_total_distance_flown')
+    '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis'
+    '/filter_data/find_total_distance_flown')
 
 for f in list_files_in_dir:
-    file_obj.add(f)
+    if not f.startswith('.'):
+        file_obj.add(f)
 
 file_obj.close()
