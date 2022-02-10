@@ -5,8 +5,10 @@ import pandas as pd
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
+from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
+
 
 dag = DAG(
     dag_id="flight_data_spark_job",
@@ -45,6 +47,13 @@ spark_job = PythonOperator(
     task_id='spark_job_runner',
     python_callable=run_all_spark_job,
     dag=dag
+)
+
+create_aws_bucket = S3CreateBucketOperator(
+    task_id='create_s3_buckets',
+    bucket_name='spark-data-ware-house',
+    region_name='us-east-1',
+
 )
 
 build_jar >> spark_job
