@@ -17,14 +17,30 @@ success_files_parents = set(map(lambda file: Path(file).parent, success_files_li
 
 filename = '/home/rahin/output/first.tar'
 
-file_obj = tarfile.open(filename, 'w')
+file_obj = tarfile.open('/home/rahin/output/zen.tar.gz', 'w:gz')
 
-list_files_in_dir = os.listdir(
-    '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis'
-    '/filter_data/find_total_distance_flown')
+file_path = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/find_total_distance_flown'
 
-for f in list_files_in_dir:
-    if not f.startswith('.'):
-        file_obj.add(f)
+for file in glob.glob(file_path + '*.*'):
+    file_obj.add(file)
 
 file_obj.close()
+
+
+def tardir(path, tar_name):
+    with tarfile.open(tar_name, "w:gz") as tar_handle:
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                tar_handle.add(os.path.join(root, file))
+    tar_handle.close()
+
+
+tardir(file_path, '/home/rahin/output/sample.tar.gz')
+
+
+def make_tarfile(output_filename, source_dir):
+    with tarfile.open(output_filename, "w:gz") as tar:
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
+
+
+make_tarfile('/home/rahin/output/test.tar', file_path)
