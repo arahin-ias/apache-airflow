@@ -45,4 +45,4 @@ success_files_parents = find_success_files_parent(all_success_file_dir)
 
 for f in success_files_parents:
     make_tarfile(output_filename=DESTINATION_DIRECTORY + os.path.basename(f) + '.tar',
-                 source_dir=SOURCE_DIRECTORY + '/' + str(f))
+                 source_dir=SOURCE_DIRECTORY + '/' + str(os.path.basename(f)))
