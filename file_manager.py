@@ -6,7 +6,7 @@ from pathlib import Path
 file_path = '/home/rahin/source-code/Intellij-Project/' \
             'Spark-Flights-Data-Analysis/filter_data/find_total_distance_flown'
 root_file_dir = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
-file_list = glob.iglob(root_file_dir + '**/**', recursive=True)
+
 output_dir = '/home/rahin/output/'
 
 
@@ -15,17 +15,36 @@ def make_tarfile(output_filename, source_dir):
         tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 
-success_files_list = filter(
-    lambda x: (
-        x.endswith('_SUCCESS')
+def find_all_files(root_dir):
+    file_list = glob.iglob(root_dir + '**/**', recursive=True)
+    return file_list
+
+
+def filter_all_success_directory(file_list):
+    success_files_list = filter(
+        lambda x: (
+            x.endswith('_SUCCESS')
+        )
+        , file_list
     )
-    , file_list
-)
+    return success_files_list
 
-success_files_parents = set(map(lambda file: Path(file).parent, success_files_list))
 
-list(map(lambda file_name: print(os.path.basename(file_name)), success_files_parents))
+def find_success_files_parent(success_file_directory):
+    success_files_parents = set(
+        map(
+            lambda file: Path(file).parent,
+            success_file_directory
+        )
+    )
+    return success_files_parents
+
+
+all_files = find_all_files(root_dir=root_file_dir)
+
+all_success_file_dir = filter_all_success_directory(all_files)
+
+success_files_parents = find_success_files_parent(all_success_file_dir)
 
 for f in success_files_parents:
     make_tarfile(output_dir + os.path.basename(f) + '.tar', output_dir)
-
