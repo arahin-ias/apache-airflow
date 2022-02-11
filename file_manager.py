@@ -37,12 +37,14 @@ def find_success_files_parent(success_file_directory):
     return success_files_parents
 
 
-all_files = find_all_files(root_dir=SOURCE_DIRECTORY)
+def compress_output_file(source, destination):
+    all_files = find_all_files(root_dir=source)
 
-all_success_file_dir = filter_all_success_directory(all_files)
+    all_success_file_dir = filter_all_success_directory(all_files)
 
-success_files_parents = find_success_files_parent(all_success_file_dir)
+    success_files_parents = find_success_files_parent(all_success_file_dir)
 
-for f in success_files_parents:
-    make_tarfile(output_filename=DESTINATION_DIRECTORY + os.path.basename(f) + '.tar',
-                 source_dir=SOURCE_DIRECTORY + '/' + str(os.path.basename(f)))
+    for f in success_files_parents:
+        make_tarfile(output_filename=destination + os.path.basename(f) + '.tar',
+                     source_dir=source + '/' + str(os.path.basename(f)))
+

@@ -8,7 +8,10 @@ from airflow.operators.dummy import DummyOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
-
+import glob
+import os
+import tarfile
+from pathlib import Path
 
 dag = DAG(
     dag_id="flight_data_spark_job",
