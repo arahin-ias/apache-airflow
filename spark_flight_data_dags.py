@@ -19,7 +19,7 @@ DESTINATION_DIRECTORY = '/home/rahin/output/'
 dag = DAG(
     dag_id="flight_data_spark_job",
     start_date=dt.datetime(2022, 2, 1),
-    schedule_interval="@hourly",
+    schedule_interval=None,
 )
 
 build_jar = BashOperator(
