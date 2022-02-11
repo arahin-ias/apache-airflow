@@ -7,8 +7,8 @@ SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-
 DESTINATION_DIRECTORY = '/home/rahin/output/'
 
 
-def make_tarfile(output_filename, source_dir):
-    with tarfile.open(output_filename, "w:gz") as tar:
+def make_tarfile(destination_dir, filename, source_dir):
+    with tarfile.open(destination_dir + filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 
@@ -45,6 +45,8 @@ def compress_output_file(source, destination):
     success_files_parents = find_success_files_parent(all_success_file_dir)
 
     for f in success_files_parents:
-        make_tarfile(output_filename=destination + os.path.basename(f) + '.tar',
+        make_tarfile(destination_dir=destination, filename=os.path.basename(f) + '.tar',
                      source_dir=source + '/' + str(os.path.basename(f)))
 
+
+compress_output_file(SOURCE_DIRECTORY, DESTINATION_DIRECTORY)
