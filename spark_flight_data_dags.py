@@ -112,8 +112,8 @@ create_directory_task = BashOperator(
 
 compress_task = PythonOperator(
     task_id='compress_task',
-    python_callable=compress_output_file(SOURCE_DIRECTORY, DESTINATION_DIRECTORY),
-    op_kwargs={"source": SOURCE_DIRECTORY},
+    python_callable=compress_output_file,
+    op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
     dag=dag,
 )
 
