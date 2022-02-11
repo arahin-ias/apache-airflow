@@ -79,63 +79,57 @@ def compress_output_file(source, destination):
                      source_dir=source + '/' + str(os.path.basename(f)))
 
 
-dag = DAG(
-    dag_id="flight_data_spark_job",
-    start_date=dt.datetime(2022, 2, 1),
-    schedule_interval=None,
-)
-
-build_jar = BashOperator(
-    task_id='build_spark_jar',
-    bash_command='mvn clean install -f ~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
-    dag=dag,
-)
-
-build_jar_dummy_task = DummyOperator(
-    task_id='build_jar_dummy_task'
-)
-
-spark_submit_dummy_task = DummyOperator(
-    task_id='spark_submit_dummy_task',
-)
-
-build_jar >> build_jar_dummy_task
-
-for spark_job_id in range(1, 7):
-    submit_spark_job = BashOperator(
-        task_id=f'submit_spark_job_{spark_job_id}',
-        bash_command=f'spark-submit --class org.flight.analysis.FlightDataProcessor '
-                     '--master spark://ubuntu:7077 '
-                     '--deploy-mode cluster '
-                     '--executor-memory 16G '
-                     '--total-executor-cores 12 '
-                     '--driver-memory 16G '
-                     '--driver-cores 12 '
-                     '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
-                     '-data-analysis-1.0-SNAPSHOT.jar '
-                     '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
-                     f'~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
-        dag=dag,
+with DAG(
+        dag_id="flight_data_spark_job",
+        start_date=dt.datetime(2022, 2, 1),
+        schedule_interval=None,
+) as dag:
+    build_jar = BashOperator(
+        task_id='build_spark_jar',
+        bash_command='mvn clean install -f ~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
     )
-    build_jar_dummy_task >> submit_spark_job >> spark_submit_dummy_task
 
-clean_output_directory = BashOperator(
-    task_id='clean_output_directory',
-    bash_command='rm -rf ~/S3UploadData',
-    dag=dag,
-)
+    build_jar_dummy_task = DummyOperator(
+        task_id='build_jar_dummy_task'
+    )
 
-create_directory_task = BashOperator(
-    task_id='create_directory_task',
-    bash_command='mkdir -p ~/S3UploadData',
-    dag=dag,
-)
+    spark_submit_dummy_task = DummyOperator(
+        task_id='spark_submit_dummy_task',
+    )
 
-compress_task = PythonOperator(
-    task_id='compress_task',
-    python_callable=compress_output_file,
-    op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
-    dag=dag,
-)
+    build_jar >> build_jar_dummy_task
 
-spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task
+    for spark_job_id in range(1, 7):
+        submit_spark_job = BashOperator(
+            task_id=f'submit_spark_job_{spark_job_id}',
+            bash_command=f'spark-submit --class org.flight.analysis.FlightDataProcessor '
+                         '--master spark://ubuntu:7077 '
+                         '--deploy-mode cluster '
+                         '--executor-memory 16G '
+                         '--total-executor-cores 12 '
+                         '--driver-memory 16G '
+                         '--driver-cores 12 '
+                         '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
+                         '-data-analysis-1.0-SNAPSHOT.jar '
+                         '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
+                         f'~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
+        )
+        build_jar_dummy_task >> submit_spark_job >> spark_submit_dummy_task
+
+    clean_output_directory = BashOperator(
+        task_id='clean_output_directory',
+        bash_command='rm -rf ~/S3UploadData',
+    )
+
+    create_directory_task = BashOperator(
+        task_id='create_directory_task',
+        bash_command='mkdir -p ~/S3UploadData',
+    )
+
+    compress_task = PythonOperator(
+        task_id='compress_task',
+        python_callable=compress_output_file,
+        op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
+    )
+
+    spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task
