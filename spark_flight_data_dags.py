@@ -16,6 +16,13 @@ from pathlib import Path
 SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '/home/rahin/S3UploadData/'
 
+transformation_data_list = ['number_of_cancelled_flights',
+                            'find_total_number_departure_flight',
+                            'find_most_cancelled_airline',
+                            'find_average_departure_delay',
+                            'find_total_distance_flown',
+                            'find_origin_and_dest_by_max_distance']
+
 
 def make_tarfile(destination_dir, filename, source_dir):
     with tarfile.open(destination_dir + filename, "w:gz") as tar:
