@@ -16,26 +16,6 @@ from pathlib import Path
 SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '/home/rahin/S3UploadData/'
 
-spark_job_task = []
-
-
-def run_all_spark_job(job_id):
-    BashOperator(
-        task_id=f'submit_spark_job_{job_id}',
-        bash_command=f'spark-submit --class org.flight.analysis.FlightDataProcessor '
-                     '--master spark://ubuntu:7077 '
-                     '--deploy-mode cluster '
-                     '--executor-memory 16G '
-                     '--total-executor-cores 12 '
-                     '--driver-memory 16G '
-                     '--driver-cores 12 '
-                     '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
-                     '-data-analysis-1.0-SNAPSHOT.jar '
-                     '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
-                     f'~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {job_id}',
-        dag=dag,
-    )
-
 
 def make_tarfile(destination_dir, filename, source_dir):
     with tarfile.open(destination_dir + filename, "w:gz") as tar:
