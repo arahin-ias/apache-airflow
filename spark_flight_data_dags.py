@@ -66,6 +66,13 @@ def compress_output_file(source, destination):
                      source_dir=source + '/' + str(os.path.basename(f)))
 
 
+def wait_for_data_to_generate(data_path):
+    supermarket_path = Path("/data/" + data_path)
+    data_files = supermarket_path.glob("*.parquet")
+    success_file = supermarket_path / "_SUCCESS"
+    return data_files and success_file.exists()
+
+
 with DAG(
         dag_id="flight_data_spark_job",
         start_date=dt.datetime(2022, 2, 1),
