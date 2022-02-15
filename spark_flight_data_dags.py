@@ -13,6 +13,8 @@ import os
 import tarfile
 from pathlib import Path
 
+from airflow.sensors.python import PythonSensor
+
 SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '/home/rahin/S3UploadData/'
 
@@ -111,7 +113,16 @@ with DAG(
                          '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
                          f'~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
         )
-        build_jar_dummy_task >> submit_spark_job >> spark_submit_dummy_task
+
+        check_file = PythonSensor(
+            task_id=f'file_sensor_{spark_job_id}',
+            python_callable=wait_for_data_to_generate,
+            op_kwargs={'data_path': SOURCE_DIRECTORY + transformation_data_list[spark_job_id - 1]},
+            mode="reschedule",
+            dag=dag,
+        )
+
+        build_jar_dummy_task >> submit_spark_job >> check_file >> spark_submit_dummy_task
 
     clean_output_directory = BashOperator(
         task_id='clean_output_directory',
