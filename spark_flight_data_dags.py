@@ -67,9 +67,9 @@ def compress_output_file(source, destination):
 
 
 def wait_for_data_to_generate(data_path):
-    supermarket_path = Path("/data/" + data_path)
-    data_files = supermarket_path.glob("*.parquet")
-    success_file = supermarket_path / "_SUCCESS"
+    flight_data = Path(data_path)
+    data_files = flight_data.glob("*.parquet")
+    success_file = flight_data / "_SUCCESS"
     return data_files and success_file.exists()
 
 
