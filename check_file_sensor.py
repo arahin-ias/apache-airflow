@@ -12,6 +12,7 @@ import glob
 import os
 import tarfile
 from pathlib import Path
+import logging
 
 from airflow.sensors.python import PythonSensor
 
@@ -20,6 +21,8 @@ def wait_for_data_to_generate(data_path):
     flight_data = Path(data_path)
     data_files = flight_data.glob("*.parquet")
     success_file = flight_data / "_SUCCESS"
+    logging.info("_SUCCESS Files Found") if success_file.exists() else logging.info("_SUCCESS Files Not Found")
+
     return data_files and success_file.exists()
 
 
