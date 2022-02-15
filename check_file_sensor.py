@@ -13,13 +13,26 @@ import os
 import tarfile
 from pathlib import Path
 
+from airflow.sensors.python import PythonSensor
+
+
+def wait_for_data_to_generate(data_path):
+    flight_data = Path(data_path)
+    data_files = flight_data.glob("*.parquet")
+    success_file = flight_data / "_SUCCESS"
+    return data_files and success_file.exists()
+
+
 with DAG(
         dag_id="check_file_sensor",
         start_date=dt.datetime(2022, 2, 1),
         schedule_interval=None,
 ) as dag:
-    check_file_task = FileSensor(
+    check_file_task = PythonSensor(
         task_id='file_sensor',
-        filepath='/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data'
-                 '/find_average_departure_delay/_SUCCESS'
+        python_callable=wait_for_data_to_generate,
+        op_kwargs={
+            "data_path": "/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data"
+                         "/find_most_cancelled_airline"},
+        dag=dag,
     )
