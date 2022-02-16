@@ -19,7 +19,7 @@ dag = DAG(
 
 create_aws_bucket = S3CreateBucketOperator(
     task_id='create_s3_buckets',
-    bucket_name='spark-data-ware-house',
+    bucket_name='test-bucket-spark',
     region_name='us-east-1',
     dag=dag,
 )
@@ -29,8 +29,8 @@ s3_resource = boto3.resource("s3", region_name="us-east-1")
 
 def upload_objects():
     try:
-        bucket_name = "spark-data-ware-house"
-        root_path = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data'
+        bucket_name = "test-bucket-spark"
+        root_path = '/home/rahin/S3UploadData'
         my_bucket = s3_resource.Bucket(bucket_name)
 
         for path, subdirs, files in os.walk(root_path):
@@ -41,3 +41,12 @@ def upload_objects():
 
     except Exception as err:
         print(err)
+
+
+test = PythonOperator(
+    task_id='upload_to_s3',
+    python_callable=upload_objects,
+    dag=dag,
+)
+
+create_aws_bucket >> test
