@@ -17,7 +17,12 @@ dag = DAG(
     schedule_interval=None,
 )
 
-create_bucket = S3CreateBucketOperator(task_id='s3_bucket_dag_create', region_name='us-east-1')
+create_bucket = S3CreateBucketOperator(
+    task_id='s3_bucket_dag_create',
+    bucket_name='adnan-test-bucket-1',
+    region_name='us-east-1',
+    dag=dag,
+)
 
 # s3 = boto3.resource('s3')
 #
