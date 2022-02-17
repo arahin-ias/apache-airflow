@@ -1,6 +1,6 @@
 import datetime as dt
 from pathlib import Path
-
+import logging
 import pandas as pd
 from airflow import DAG
 from airflow.operators.bash import BashOperator
@@ -8,8 +8,13 @@ from airflow.operators.dummy import DummyOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
+import glob
 import os
+import tarfile
+from pathlib import Path
 import boto3
+from botocore.exceptions import ClientError
+from airflow.sensors.python import PythonSensor
 
 dag = DAG(
     dag_id='aws_s3_bucket_create',
@@ -23,6 +28,19 @@ create_bucket = S3CreateBucketOperator(
     region_name='us-east-1',
     dag=dag,
 )
+
+
+def upload_file(file_name, bucket, object_name=None):
+    if object_name is None:
+        object_name = os.path.basename(file_name)
+
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.upload_file(file_name, bucket, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
 
 # s3 = boto3.resource('s3')
 #
