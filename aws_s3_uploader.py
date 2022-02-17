@@ -42,6 +42,15 @@ def upload_file(file_name, bucket, object_name=None):
         return False
     return True
 
+
+upload_files = PythonOperator(
+    task_id='upload_files',
+    python_callable=upload_file,
+    op_kwargs={'file_name': '/home/rahin/S3UploadData/find_average_departure_delay.tar',
+               'bucket': 'adnan-test-bucket-1'},
+    dag=dag,
+)
+
 # s3 = boto3.resource('s3')
 #
 # for bucket in s3.buckets.all():
