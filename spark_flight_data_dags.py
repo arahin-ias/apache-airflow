@@ -169,12 +169,12 @@ with DAG(
 
     all_upload_files_list = list_of_upload_files('/home/rahin/S3UploadData/')
 
-    file_upload_dummy_task = DummyOperator(
+    create_bucket_dummy_task = DummyOperator(
         task_id='file_upload_dummy_task',
     )
 
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> \
-    compress_task >> file_upload_dummy_task
+    compress_task >> create_bucket_dummy_task
 
     create_bucket = S3CreateBucketOperator(
         task_id='s3_bucket_dag_create',
@@ -182,7 +182,7 @@ with DAG(
         region_name='us-east-1',
     )
 
-    file_upload_dummy_task >> create_bucket
+    create_bucket_dummy_task >> create_bucket
 
     for file in all_upload_files_list:
         file_name = os.path.basename(file)
