@@ -105,6 +105,12 @@ def upload_file(file_name, bucket, object_name=None):
     return True
 
 
+def upload_files(source_dir, bucket):
+    upload_files_list = list_of_upload_files(source_dir)
+    for file in upload_files_list:
+        upload_file(file, bucket)
+
+
 with DAG(
         dag_id="flight_data_spark_job",
         start_date=dt.datetime(2022, 2, 1),
@@ -167,8 +173,6 @@ with DAG(
         op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
     )
 
-    all_upload_files_list = list_of_upload_files('/home/rahin/S3UploadData/')
-
     create_bucket_dummy_task = DummyOperator(
         task_id='file_upload_dummy_task',
     )
@@ -190,14 +194,10 @@ with DAG(
 
     create_bucket >> upload_file_dummy_task
 
-    task_id_incrementer = 0
-
-    for file in all_upload_files_list:
-        task_id_incrementer += 1
-        upload_files = PythonOperator(
-            task_id=f'upload_files_{task_id_incrementer}',
-            python_callable=upload_file,
-            op_kwargs={'file_name': file,
-                       'bucket': 'spark-flight-data-bucket'},
-        )
-        upload_file_dummy_task >> upload_files
+    upload_files = PythonOperator(
+        task_id=f'upload_files',
+        python_callable=upload_files,
+        op_kwargs={'source_dir': '/home/rahin/S3UploadData/',
+                   'bucket': 'spark-flight-data-bucket'},
+    )
+    upload_file_dummy_task >> upload_files
