@@ -51,35 +51,4 @@ upload_files = PythonOperator(
     dag=dag,
 )
 
-# s3 = boto3.resource('s3')
-#
-# for bucket in s3.buckets.all():
-#     print(bucket.name)
-
-#
-# s3_resource = boto3.resource("s3", region_name="us-east-1")
-#
-#
-# def upload_objects():
-#     try:
-#         bucket_name = "test-bucket-spark"
-#         root_path = '/home/rahin/S3UploadData'
-#         my_bucket = s3_resource.Bucket(bucket_name)
-#
-#         for path, subdirs, files in os.walk(root_path):
-#             path = path.replace("\\", "/")
-#             directory_name = path.replace(root_path, "")
-#             for file in files:
-#                 my_bucket.upload_file(os.path.join(path, file), directory_name + '/' + file)
-#
-#     except Exception as err:
-#         print(err)
-#
-#
-# test = PythonOperator(
-#     task_id='upload_to_s3',
-#     python_callable=upload_objects,
-#     dag=dag,
-# )
-#
-# create_aws_bucket >> test
+create_bucket >> upload_files
