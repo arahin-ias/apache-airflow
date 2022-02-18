@@ -192,3 +192,4 @@ with DAG(
             op_kwargs={'file_name': file,
                        'bucket': 'spark-flight-data-bucket'},
         )
+        create_bucket >> upload_files
