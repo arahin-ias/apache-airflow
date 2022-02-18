@@ -188,6 +188,8 @@ with DAG(
         task_id='upload_file_dummy_task',
     )
 
+    create_bucket >> upload_file_dummy_task
+
     for file in all_upload_files_list:
         file_name = os.path.basename(file)
         upload_files = PythonOperator(
