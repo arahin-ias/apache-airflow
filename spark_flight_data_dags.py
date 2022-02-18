@@ -169,4 +169,23 @@ with DAG(
 
     all_upload_files_list = list_of_upload_files('/home/rahin/S3UploadData/')
 
-    spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task
+    file_upload_dummy_task = DummyOperator(
+        task_id='file_upload_dummy_task',
+    )
+
+    spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task \
+    >> file_upload_dummy_task
+
+    create_bucket = S3CreateBucketOperator(
+        task_id='s3_bucket_dag_create',
+        bucket_name='spark-flight-data-bucket',
+        region_name='us-east-1',
+    )
+
+    for file in all_upload_files_list:
+        upload_files = PythonOperator(
+            task_id='upload_files',
+            python_callable=upload_file,
+            op_kwargs={'file_name': file,
+                       'bucket': 'spark-flight-data-bucket'},
+        )
