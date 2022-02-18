@@ -190,10 +190,12 @@ with DAG(
 
     create_bucket >> upload_file_dummy_task
 
+    task_id_incrementer = 0
+
     for file in all_upload_files_list:
-        file_name = os.path.basename(file)
+        task_id_incrementer += 1
         upload_files = PythonOperator(
-            task_id=f'upload_files_{file_name}',
+            task_id=f'upload_files_{task_id_incrementer}',
             python_callable=upload_file,
             op_kwargs={'file_name': file,
                        'bucket': 'spark-flight-data-bucket'},
