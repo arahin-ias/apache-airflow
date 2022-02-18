@@ -79,6 +79,19 @@ def wait_for_data_to_generate(data_path):
     return data_files and success_file.exists()
 
 
+def list_of_upload_files(source):
+    upload_files_list = find_all_files(source)
+
+    tar_file = filter(
+        lambda x: (
+            x.endswith('tar')
+        )
+        , upload_files_list
+    )
+
+    return tar_file
+
+
 def upload_file(file_name, bucket, object_name=None):
     if object_name is None:
         object_name = os.path.basename(file_name)
@@ -153,5 +166,7 @@ with DAG(
         python_callable=compress_output_file,
         op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
     )
+
+    all_upload_files_list = find_all_files('/home/rahin/S3UploadData/')
 
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task
