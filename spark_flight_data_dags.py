@@ -167,6 +167,6 @@ with DAG(
         op_kwargs={"source": SOURCE_DIRECTORY, 'destination': DESTINATION_DIRECTORY},
     )
 
-    all_upload_files_list = find_all_files('/home/rahin/S3UploadData/')
+    all_upload_files_list = list_of_upload_files('/home/rahin/S3UploadData/')
 
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> compress_task
