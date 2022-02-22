@@ -15,3 +15,9 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
+
+dag = DAG(
+    dag_id='aws_s3_hooks',
+    start_date=dt.datetime(2022, 2, 1),
+    schedule_interval=None,
+)
