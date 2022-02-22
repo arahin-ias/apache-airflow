@@ -7,3 +7,8 @@ def create_bucket():
 
 
 create_bucket()
+
+
+def remove_bucket():
+    hook = S3Hook(aws_conn_id='aws_credentials')
+
