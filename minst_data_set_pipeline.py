@@ -22,7 +22,7 @@ dag = DAG(
 create_s3_bucket = PythonOperator(
     task_id='create_s3_bucket_for_mnist_data',
     python_callable=create_bucket,
-    op_kwargs={'bucket_name': ''},
+    op_kwargs={'bucket_name': BUCKET_NAME},
     dag=dag,
 )
 
@@ -30,7 +30,9 @@ download_mnist_data = S3CopyObjectOperator(
     task_id='download_mnist_data',
     source_bucket_name="sagemaker-sample-data-eu-west-1",
     source_bucket_key="algorithms/kmeans/mnist/mnist.pkl.gz",
-    dest_bucket_name="your-bucket",
+    dest_bucket_name=BUCKET_NAME,
     dest_bucket_key="mnist.pkl.gz",
     dag=dag,
 )
+
+create_s3_bucket >> download_mnist_data
