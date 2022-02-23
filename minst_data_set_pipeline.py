@@ -1,12 +1,29 @@
 import airflow
 from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
+
+BUCKET_NAME = 'mnist-bucket'
+
+
+def create_bucket(**context):
+    hook = S3Hook(aws_conn_id='aws_credentials')
+    hook.create_bucket(bucket_name=context['bucket_name'])
+
 
 dag = DAG(
     dag_id='aws_handwritten_digit_classifier',
     schedule_interval=None,
     start_date=airflow.utils.dates.days_ago(3),
+)
+
+create_s3_bucket = PythonOperator(
+    task_id='create_s3_bucket_for_mnist_data',
+    python_callable=create_bucket,
+    op_kwargs={'bucket_name': ''},
+    dag=dag,
 )
 
 download_mnist_data = S3CopyObjectOperator(
