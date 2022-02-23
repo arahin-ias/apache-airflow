@@ -5,12 +5,12 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
 
-BUCKET_NAME = 'mnist-bucket'
+BUCKET_NAME = 'mnist-bucket-optimus'
 
 
-def create_bucket(**context):
+def create_bucket():
     hook = S3Hook(aws_conn_id='aws_credentials')
-    hook.create_bucket(bucket_name=context['bucket_name'])
+    hook.create_bucket(bucket_name=BUCKET_NAME)
 
 
 dag = DAG(
@@ -22,7 +22,6 @@ dag = DAG(
 create_s3_bucket = PythonOperator(
     task_id='create_s3_bucket_for_mnist_data',
     python_callable=create_bucket,
-    op_kwargs={'bucket_name': BUCKET_NAME},
     dag=dag,
 )
 
