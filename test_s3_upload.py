@@ -12,17 +12,6 @@ from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 BUCKET_NAME = 'mnist-bucket-optimus'
 
-dag = DAG(
-    dag_id='aws_handwritten_digit_classifier',
-    schedule_interval=None,
-    start_date=airflow.utils.dates.days_ago(3),
-)
-
-
-def create_bucket():
-    hook = S3Hook(aws_conn_id='aws_credentials')
-    hook.create_bucket(bucket_name=BUCKET_NAME)
-
 
 def extract_mnist_data():
     s3hook = S3Hook(aws_conn_id='aws_credentials')
@@ -44,25 +33,4 @@ def extract_mnist_data():
         )
 
 
-extract_mnist_data = PythonOperator(
-    task_id='extract_mnist_data',
-    python_callable=extract_mnist_data,
-    dag=dag,
-)
-
-create_s3_bucket = PythonOperator(
-    task_id='create_s3_bucket_for_mnist_data',
-    python_callable=create_bucket,
-    dag=dag,
-)
-
-download_mnist_data = S3CopyObjectOperator(
-    task_id='download_mnist_data',
-    source_bucket_name="sagemaker-sample-data-eu-west-1",
-    source_bucket_key="algorithms/kmeans/mnist/mnist.pkl.gz",
-    dest_bucket_name=BUCKET_NAME,
-    dest_bucket_key="mnist.pkl.gz",
-    dag=dag,
-)
-
-create_s3_bucket >> download_mnist_data >> extract_mnist_data
+extract_mnist_data()
