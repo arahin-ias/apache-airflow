@@ -1,7 +1,7 @@
 import gzip
 import io
 import pickle
-
+from jinja2 import Template
 import airflow
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -80,13 +80,13 @@ sagemaker_train_model = SageMakerTrainingOperator(
                 "DataSource": {
                     "S3DataSource": {
                         "S3DataType": "S3Prefix",
-                        "S3Uri": "s3://{{BUCKET_NAME}}/mnist_data",
+                        "S3Uri": "s3://mnist-bucket-optimus/mnist_data",
                         "S3DataDistributionType": "FullyReplicated",
                     }
                 },
             }
         ],
-        "OutputDataConfig": {"S3OutputPath": "s3://your-bucket/mnistclassifier-output"},
+        "OutputDataConfig": {"S3OutputPath": "s3://mnist-bucket-optimus/mnistclassifier-output"},
         "ResourceConfig": {
             "InstanceType": "ml.c4.xlarge",
             "InstanceCount": 1,
@@ -114,7 +114,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
             "PrimaryContainer": {
                 "Image": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
                 "ModelDataUrl": (
-                    "s3://your-bucket/mnistclassifier-output/mnistclassifier"
+                    "s3://mnist-bucket-optimus/mnistclassifier-output/mnistclassifier"
                     "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
                     "output/model.tar.gz"
                 ),  # this will link the model and the training job
