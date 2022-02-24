@@ -65,4 +65,4 @@ download_mnist_data = S3CopyObjectOperator(
     dag=dag,
 )
 
-create_s3_bucket >> download_mnist_data
+create_s3_bucket >> download_mnist_data >> extract_mnist_data
