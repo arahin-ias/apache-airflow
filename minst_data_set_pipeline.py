@@ -1,9 +1,14 @@
+import gzip
+import io
+import pickle
+
 import airflow
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
+from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 BUCKET_NAME = 'mnist-bucket-optimus'
 
@@ -16,7 +21,18 @@ def create_bucket():
 def extract_mnist_data():
     s3_hooks = S3Hook(aws_conn_id='aws_credentials')
 
+    mnist_buffer = io.BytesIO
+    mnist_obj = s3_hooks.get_key(bucket_name=BUCKET_NAME, key='mnist.pkl.gz')
+    mnist_obj.download_file(mnist_buffer)
 
+    mnist_buffer.seek(0)
+
+    with gzip.GzipFile(fileobj=mnist_buffer, mode="rb") as f:
+        train_set, _, _ = pickle.loads(f.read(), encoding='latin1')
+        output_buffer = io.BytesIO
+        write_numpy_to_dense_tensor(
+            file=output_buffer, array=train_set[0], labels=train_set[1]
+        )
 
 dag = DAG(
     dag_id='aws_handwritten_digit_classifier',
