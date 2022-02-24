@@ -12,21 +12,25 @@ from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 BUCKET_NAME = 'mnist-bucket-optimus'
 
+dag = DAG(
+    dag_id='aws_handwritten_digit_classifier',
+    schedule_interval=None,
+    start_date=airflow.utils.dates.days_ago(3),
+)
+
 
 def create_bucket():
     hook = S3Hook(aws_conn_id='aws_credentials')
     hook.create_bucket(bucket_name=BUCKET_NAME)
 
 
-def _extract_mnist_data():
-    s3hook = S3Hook()
+def extract_mnist_data():
+    s3hook = S3Hook(aws_conn_id='aws_credentials')
 
-    # Download S3 dataset into memory
     mnist_buffer = io.BytesIO()
     mnist_obj = s3hook.get_key(bucket_name="your-bucket", key="mnist.pkl.gz")
     mnist_obj.download_fileobj(mnist_buffer)
 
-    # Unpack gzip file, extract dataset, convert to dense tensor, upload back to S3
     mnist_buffer.seek(0)
     with gzip.GzipFile(fileobj=mnist_buffer, mode="rb") as f:
         train_set, _, _ = pickle.loads(f.read(), encoding="latin1")
@@ -40,10 +44,10 @@ def _extract_mnist_data():
         )
 
 
-dag = DAG(
-    dag_id='aws_handwritten_digit_classifier',
-    schedule_interval=None,
-    start_date=airflow.utils.dates.days_ago(3),
+extract_mnist_data = PythonOperator(
+    task_id='extract_mnist_data',
+    python_callable=extract_mnist_data,
+    dag=dag,
 )
 
 create_s3_bucket = PythonOperator(
