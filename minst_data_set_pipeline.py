@@ -18,21 +18,27 @@ def create_bucket():
     hook.create_bucket(bucket_name=BUCKET_NAME)
 
 
-def extract_mnist_data():
-    s3_hooks = S3Hook(aws_conn_id='aws_credentials')
+def _extract_mnist_data():
+    s3hook = S3Hook()
 
-    mnist_buffer = io.BytesIO
-    mnist_obj = s3_hooks.get_key(bucket_name=BUCKET_NAME, key='mnist.pkl.gz')
-    mnist_obj.download_file(mnist_buffer)
+    # Download S3 dataset into memory
+    mnist_buffer = io.BytesIO()
+    mnist_obj = s3hook.get_key(bucket_name="your-bucket", key="mnist.pkl.gz")
+    mnist_obj.download_fileobj(mnist_buffer)
 
+    # Unpack gzip file, extract dataset, convert to dense tensor, upload back to S3
     mnist_buffer.seek(0)
-
     with gzip.GzipFile(fileobj=mnist_buffer, mode="rb") as f:
-        train_set, _, _ = pickle.loads(f.read(), encoding='latin1')
-        output_buffer = io.BytesIO
+        train_set, _, _ = pickle.loads(f.read(), encoding="latin1")
+        output_buffer = io.BytesIO()
         write_numpy_to_dense_tensor(
             file=output_buffer, array=train_set[0], labels=train_set[1]
         )
+        output_buffer.seek(0)
+        s3hook.load_file_obj(
+            output_buffer, key="mnist_data", bucket_name=BUCKET_NAME, replace=True
+        )
+
 
 dag = DAG(
     dag_id='aws_handwritten_digit_classifier',
