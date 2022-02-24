@@ -13,6 +13,11 @@ def create_bucket():
     hook.create_bucket(bucket_name=BUCKET_NAME)
 
 
+def extract_mnist_data():
+    s3_hooks = S3Hook(aws_conn_id='aws_credentials')
+
+
+
 dag = DAG(
     dag_id='aws_handwritten_digit_classifier',
     schedule_interval=None,
