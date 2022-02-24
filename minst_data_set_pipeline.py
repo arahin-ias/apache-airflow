@@ -6,9 +6,8 @@ import airflow
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
-from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.providers.amazon.aws.operators.s3 import S3CopyObjectOperator
-from airflow.providers.amazon.aws.operators.sagemaker import SageMakerTrainingOperator
+from airflow.providers.amazon.aws.operators.sagemaker import SageMakerTrainingOperator, SageMakerEndpointOperator
 from sagemaker.amazon.common import write_numpy_to_dense_tensor
 
 BUCKET_NAME = 'mnist-bucket-optimus'
@@ -105,4 +104,43 @@ sagemaker_train_model = SageMakerTrainingOperator(
     dag=dag,
 )
 
-create_s3_bucket >> download_mnist_data >> extract_mnist_data
+sagemaker_deploy_model = SageMakerEndpointOperator(
+    task_id="sagemaker_deploy_model",
+    operation="update",
+    wait_for_completion=True,
+    config={
+        "Model": {
+            "ModelName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
+            "PrimaryContainer": {
+                "Image": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
+                "ModelDataUrl": (
+                    "s3://your-bucket/mnistclassifier-output/mnistclassifier"
+                    "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
+                    "output/model.tar.gz"
+                ),  # this will link the model and the training job
+            },
+            "ExecutionRoleArn": (
+                "arn:aws:iam::297623009465:role/service-role/"
+                "AmazonSageMaker-ExecutionRole-20180905T153196"
+            ),
+        },
+        "EndpointConfig": {
+            "EndpointConfigName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
+            "ProductionVariants": [
+                {
+                    "InitialInstanceCount": 1,
+                    "InstanceType": "ml.t2.medium",
+                    "ModelName": "mnistclassifier",
+                    "VariantName": "AllTraffic",
+                }
+            ],
+        },
+        "Endpoint": {
+            "EndpointConfigName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
+            "EndpointName": "mnistclassifier",
+        },
+    },
+    dag=dag,
+)
+
+create_s3_bucket >> download_mnist_data >> extract_mnist_data >> sagemaker_train_model >> sagemaker_deploy_model
