@@ -1,7 +1,7 @@
 import gzip
 import io
 import pickle
-
+import datetime as dt
 import airflow
 from airflow import DAG
 from airflow.operators.python import PythonOperator
@@ -33,4 +33,8 @@ def extract_mnist_data():
         )
 
 
-extract_mnist_data()
+dag = DAG(
+    dag_id='bucket_create_optimus',
+    schedule_interval=None,
+    start_date=dt.datetime(2022, 2, 1),
+)
