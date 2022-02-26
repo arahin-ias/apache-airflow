@@ -38,3 +38,9 @@ dag = DAG(
     schedule_interval=None,
     start_date=dt.datetime(2022, 2, 1),
 )
+
+extract_mnist_data = PythonOperator(
+    task_id='extract_mnist_data',
+    python_callable=extract_mnist_data,
+    dag=dag
+)
