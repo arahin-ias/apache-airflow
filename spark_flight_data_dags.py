@@ -16,7 +16,7 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
-SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
+SOURCE_DIRECTORY = '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '/home/rahin/S3UploadData/'
 
 transformation_data_list = ['number_of_cancelled_flights',
@@ -197,7 +197,7 @@ with DAG(
     upload_files = PythonOperator(
         task_id=f'upload_files',
         python_callable=upload_files,
-        op_kwargs={'source_dir': '/home/rahin/S3UploadData/',
+        op_kwargs={'source_dir': '~/S3UploadData/',
                    'bucket': 'spark-flight-data-bucket'},
     )
     upload_file_dummy_task >> upload_files
