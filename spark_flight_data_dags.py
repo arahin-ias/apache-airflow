@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
 SOURCE_DIRECTORY = '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
-DESTINATION_DIRECTORY = '/home/rahin/S3UploadData/'
+DESTINATION_DIRECTORY = '~/S3UploadData/'
 
 transformation_data_list = ['number_of_cancelled_flights',
                             'find_total_number_departure_flight',
