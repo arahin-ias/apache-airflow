@@ -201,7 +201,7 @@ with DAG(
     upload_files = PythonOperator(
         task_id=f'upload_files',
         python_callable=upload_files,
-        op_kwargs={'source_dir': '~/S3UploadData/',
+        op_kwargs={'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
                    'bucket': BUCKET_NAME},
     )
     upload_file_dummy_task >> upload_files
