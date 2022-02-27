@@ -16,6 +16,7 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
+ROOT_DIRECTORY = '/home/rahin'
 SOURCE_DIRECTORY = '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '~/S3UploadData/'
 
@@ -118,7 +119,8 @@ with DAG(
 ) as dag:
     build_jar = BashOperator(
         task_id='build_spark_jar',
-        bash_command='mvn clean install -f ~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
+        bash_command=f'mvn clean install -f '
+                     f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
     )
 
     build_jar_dummy_task = DummyOperator(
@@ -141,10 +143,10 @@ with DAG(
                          '--total-executor-cores 12 '
                          '--driver-memory 16G '
                          '--driver-cores 12 '
-                         '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/spark-flights'
-                         '-data-analysis-1.0-SNAPSHOT.jar '
-                         '~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
-                         f'~/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
+                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/'
+                         f'spark-flights-data-analysis-1.0-SNAPSHOT.jar '
+                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
+                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
         )
 
         check_file = PythonSensor(
