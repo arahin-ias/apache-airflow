@@ -146,7 +146,8 @@ with DAG(
                          f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/'
                          f'spark-flights-data-analysis-1.0-SNAPSHOT.jar '
                          f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
-                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data {spark_job_id}',
+                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data '
+                         f'{spark_job_id}',
         )
 
         check_file = PythonSensor(
