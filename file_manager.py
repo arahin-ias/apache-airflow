@@ -3,7 +3,8 @@ import os
 import tarfile
 from pathlib import Path
 
-SOURCE_DIRECTORY = '/home/rahin/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
+ROOT_DIRECTORY = '/home/rahin'
+SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = '/home/rahin/output/'
 
 
