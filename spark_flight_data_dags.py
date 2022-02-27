@@ -19,7 +19,7 @@ from airflow.sensors.python import PythonSensor
 BUCKET_NAME = 'spark-flight-data-bucket'
 ROOT_DIRECTORY = '/home/rahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
-DESTINATION_DIRECTORY = '~/S3UploadData/'
+DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/S3UploadData/'
 
 transformation_data_list = ['number_of_cancelled_flights',
                             'find_total_number_departure_flight',

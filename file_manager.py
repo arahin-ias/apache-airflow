@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT_DIRECTORY = '/home/rahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
-DESTINATION_DIRECTORY = '/home/rahin/output/'
+DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/output/'
 
 
 def make_tarfile(destination_dir, filename, source_dir):
