@@ -211,7 +211,13 @@ with DAG(
         region_name='us-east-1',
     )
 
-    create_bucket_dummy_task >> create_bucket_S3_operator
+    create_bucket_s3_hook = PythonOperator(
+        task_id='create_bucket_s3_hook',
+        python_callable=create_bucket,
+        op_kwargs={'bucket_name': BUCKET_NAME_S3HOOK}
+    )
+
+    create_bucket_dummy_task >> [create_bucket_S3_operator, create_bucket_s3_hook]
 
     upload_file_dummy_task = DummyOperator(
         task_id='upload_file_dummy_task',
@@ -219,10 +225,10 @@ with DAG(
 
     create_bucket_S3_operator >> upload_file_dummy_task
 
-    upload_files = PythonOperator(
+    upload_files_boto_3_client = PythonOperator(
         task_id=f'upload_files',
         python_callable=upload_files,
         op_kwargs={'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
                    'bucket': BUCKET_NAME_OPERATOR},
     )
-    upload_file_dummy_task >> upload_files
+    upload_file_dummy_task >> upload_files_boto_3_client
