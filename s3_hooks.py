@@ -1,3 +1,5 @@
+import os.path
+
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 import glob
 
@@ -19,12 +21,16 @@ def list_bucket():
 
 def load_data(**context):
     bucket_name = context['bucket_name']
+    file_path = context['file_path']
+    list_of_file_to_uploaded = list_of_upload_files(file_path)
+
     hook = S3Hook(aws_conn_id='aws_default')
-    hook.load_file(
-        filename='/home/rahin/S3UploadData/find_average_departure_delay.tar',
-        key='spark/find_average_departure_delay.tar',
-        bucket_name='spark-flight-test-data-bucket',
-    )
+    for file in list_of_file_to_uploaded:
+        hook.load_file(
+            filename=f'{file}',
+            key=f'spark/{os.path.basename(file)}',
+            bucket_name=bucket_name,
+        )
 
 
 def find_all_files(root_dir):
@@ -45,10 +51,7 @@ def list_of_upload_files(source):
     return tar_file
 
 
-file_list = list_of_upload_files(f'{ROOT_DIRECTORY}/S3UploadData/')
+# file_list = list_of_upload_files(f'{ROOT_DIRECTORY}/S3UploadData/')
 
-for file in file_list:
-    print(str(file))
-
-# load_data()
+load_data(bucket_name='my-context-test-bucket', file_path=f'{ROOT_DIRECTORY}/S3UploadData/')
 # list_bucket()

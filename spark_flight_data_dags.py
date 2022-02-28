@@ -5,6 +5,7 @@ import pandas as pd
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
@@ -111,6 +112,25 @@ def upload_files(source_dir, bucket):
     upload_files_list = list_of_upload_files(source_dir)
     for file in upload_files_list:
         upload_file(file, bucket)
+
+
+def create_bucket(**context):
+    hook = S3Hook(aws_conn_id='aws_default')
+    hook.create_bucket(bucket_name=context['bucket_name'])
+
+
+def load_data(**context):
+    bucket_name = context['bucket_name']
+    file_path = context['file_path']
+    list_of_file_to_uploaded = list_of_upload_files(file_path)
+
+    hook = S3Hook(aws_conn_id='aws_default')
+    for file in list_of_file_to_uploaded:
+        hook.load_file(
+            filename=f'{file}',
+            key=f'spark/{os.path.basename(file)}',
+            bucket_name=bucket_name,
+        )
 
 
 with DAG(
