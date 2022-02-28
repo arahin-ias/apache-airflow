@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
 BUCKET_NAME_OPERATOR = 'spark-flight-data-bucket-operator'
-BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-operator-s3hook'
+BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-s3hook'
 ROOT_DIRECTORY = '/home/rahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/S3UploadData/'
