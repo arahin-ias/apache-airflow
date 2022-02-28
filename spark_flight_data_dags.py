@@ -229,7 +229,7 @@ with DAG(
         task_id='upload_files_s3_hook',
         python_callable=load_data,
         op_kwargs={
-            'bucket_name': 'my-context-test-bucket',
+            'bucket_name': BUCKET_NAME_S3HOOK,
             'file_path': f'{ROOT_DIRECTORY}/S3UploadData/'
         }
     )
@@ -243,5 +243,5 @@ with DAG(
             'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
             'bucket': BUCKET_NAME_OPERATOR},
     )
-    
+
     upload_file_dummy_task >> upload_files_boto_3_client
