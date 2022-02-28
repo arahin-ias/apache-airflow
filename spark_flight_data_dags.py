@@ -17,7 +17,8 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
-BUCKET_NAME = 'spark-flight-data-bucket'
+BUCKET_NAME_OPERATOR = 'spark-flight-data-bucket-operator'
+BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-operator-s3hook'
 ROOT_DIRECTORY = '/home/rahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/S3UploadData/'
@@ -204,24 +205,24 @@ with DAG(
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> \
     compress_task >> create_bucket_dummy_task
 
-    create_bucket = S3CreateBucketOperator(
-        task_id='s3_bucket_dag_create',
-        bucket_name=BUCKET_NAME,
+    create_bucket_S3_operator = S3CreateBucketOperator(
+        task_id='create_bucket_S3_operator',
+        bucket_name=BUCKET_NAME_OPERATOR,
         region_name='us-east-1',
     )
 
-    create_bucket_dummy_task >> create_bucket
+    create_bucket_dummy_task >> create_bucket_S3_operator
 
     upload_file_dummy_task = DummyOperator(
         task_id='upload_file_dummy_task',
     )
 
-    create_bucket >> upload_file_dummy_task
+    create_bucket_S3_operator >> upload_file_dummy_task
 
     upload_files = PythonOperator(
         task_id=f'upload_files',
         python_callable=upload_files,
         op_kwargs={'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
-                   'bucket': BUCKET_NAME},
+                   'bucket': BUCKET_NAME_OPERATOR},
     )
     upload_file_dummy_task >> upload_files
