@@ -234,6 +234,8 @@ with DAG(
         }
     )
 
+    create_bucket_s3_hook >> upload_files_s3_hook
+
     upload_files_boto_3_client = PythonOperator(
         task_id=f'upload_files_boto_3_client',
         python_callable=upload_files,
