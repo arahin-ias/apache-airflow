@@ -25,7 +25,7 @@ download_mnist_data = S3CopyObjectOperator(
     task_id="download_mnist_data",
     source_bucket_name="sagemaker-sample-data-eu-west-1",
     source_bucket_key="algorithms/kmeans/mnist/mnist.pkl.gz",
-    dest_bucket_name="your-bucket",
+    dest_bucket_name="digit-classifier-bucket-arahin",
     dest_bucket_key="mnist.pkl.gz",
     dag=dag,
 )
@@ -36,7 +36,7 @@ def _extract_mnist_data():
 
     # Download S3 dataset into memory
     mnist_buffer = io.BytesIO()
-    mnist_obj = s3hook.get_key(bucket_name="your-bucket", key="mnist.pkl.gz")
+    mnist_obj = s3hook.get_key(bucket_name="digit-classifier-bucket-arahin", key="mnist.pkl.gz")
     mnist_obj.download_fileobj(mnist_buffer)
 
     # Unpack gzip file, extract dataset, convert to dense tensor, upload back to S3
@@ -49,7 +49,7 @@ def _extract_mnist_data():
         )
         output_buffer.seek(0)
         s3hook.load_file_obj(
-            output_buffer, key="mnist_data", bucket_name="your-bucket", replace=True
+            output_buffer, key="mnist_data", bucket_name="digit-classifier-bucket-arahin", replace=True
         )
 
 
@@ -72,13 +72,13 @@ sagemaker_train_model = SageMakerTrainingOperator(
                 "DataSource": {
                     "S3DataSource": {
                         "S3DataType": "S3Prefix",
-                        "S3Uri": "s3://your-bucket/mnist_data",
+                        "S3Uri": "s3://digit-classifier-bucket-arahin/mnist_data",
                         "S3DataDistributionType": "FullyReplicated",
                     }
                 },
             }
         ],
-        "OutputDataConfig": {"S3OutputPath": "s3://your-bucket/mnistclassifier-output"},
+        "OutputDataConfig": {"S3OutputPath": "s3://digit-classifier-bucket-arahin/mnistclassifier-output"},
         "ResourceConfig": {
             "InstanceType": "ml.c4.xlarge",
             "InstanceCount": 1,
@@ -106,7 +106,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
             "PrimaryContainer": {
                 "Image": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
                 "ModelDataUrl": (
-                    "s3://your-bucket/mnistclassifier-output/mnistclassifier"
+                    "s3://digit-classifier-bucket-arahin/mnistclassifier-output/mnistclassifier"
                     "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
                     "output/model.tar.gz"
                 ),  # this will link the model and the training job
