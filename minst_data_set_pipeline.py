@@ -93,8 +93,7 @@ sagemaker_train_model = SageMakerTrainingOperator(
             "VolumeSizeInGB": 10,
         },
         "RoleArn": (
-            "arn:aws:iam::297623009465:role/service-role/"
-            "AmazonSageMaker-ExecutionRole-20180905T153196"
+            "arn:aws:iam::014825026763:role/aws-sagemaker-arahin"
         ),
         "StoppingCondition": {"MaxRuntimeInSeconds": 24 * 60 * 60},
     },
@@ -120,8 +119,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
                 ),  # this will link the model and the training job
             },
             "ExecutionRoleArn": (
-                "arn:aws:iam::297623009465:role/service-role/"
-                "AmazonSageMaker-ExecutionRole-20180905T153196"
+                "arn:aws:iam::014825026763:role/aws-sagemaker-arahin"
             ),
         },
         "EndpointConfig": {
