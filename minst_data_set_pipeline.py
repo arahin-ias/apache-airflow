@@ -70,7 +70,7 @@ sagemaker_train_model = SageMakerTrainingOperator(
     config={
         "TrainingJobName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
         "AlgorithmSpecification": {
-            "TrainingImage": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
+            "TrainingImage": "438346466558.dkr.ecr.us-east-2.amazonaws.com/kmeans:1",
             "TrainingInputMode": "File",
         },
         "HyperParameters": {"k": "10", "feature_dim": "784"},
@@ -111,7 +111,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
         "Model": {
             "ModelName": "mnistclassifier-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}",
             "PrimaryContainer": {
-                "Image": "438346466558.dkr.ecr.eu-west-1.amazonaws.com/kmeans:1",
+                "Image": "438346466558.dkr.ecr.us-east-2.amazonaws.com/kmeans:1",
                 "ModelDataUrl": (
                     "s3://mnist-bucket-optimus/mnistclassifier-output/mnistclassifier"
                     "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
