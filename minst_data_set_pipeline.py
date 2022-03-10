@@ -116,7 +116,7 @@ sagemaker_deploy_model = SageMakerEndpointOperator(
                     "s3://mnist-bucket-optimus/mnistclassifier-output/mnistclassifier"
                     "-{{ execution_date.strftime('%Y-%m-%d-%H-%M-%S') }}/"
                     "output/model.tar.gz"
-                ),  # this will link the model and the training job
+                ),
             },
             "ExecutionRoleArn": (
                 "arn:aws:iam::014825026763:role/aws-sagemaker-arahin"
