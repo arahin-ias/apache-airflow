@@ -20,12 +20,12 @@ dag = DAG(
 
 
 def create_bucket():
-    hook = S3Hook(aws_conn_id='aws_credentials')
-    hook.create_bucket(bucket_name=BUCKET_NAME)
+    hook = S3Hook(aws_conn_id='aws_default')
+    hook.create_bucket(bucket_name=BUCKET_NAME, region_name='us-east-2')
 
 
 def extract_mnist_data():
-    s3hook = S3Hook(aws_conn_id='aws_credentials')
+    s3hook = S3Hook(aws_conn_id='aws_default')
 
     mnist_buffer = io.BytesIO()
     mnist_obj = s3hook.get_key(bucket_name=BUCKET_NAME, key="mnist.pkl.gz")
