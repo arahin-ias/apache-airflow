@@ -1,8 +1,12 @@
-FROM continuumio/miniconda3:4.7.12
+FROM python:3.8-slim
 
-RUN pip install pandas==1.0.1 minio==5.0.7
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
 
-COPY crunchdata.py /root/crunchdata.py
+COPY app.py fetch_ratings.py /
+RUN python /fetch_ratings.py --output_path /ratings.csv
+
+EXPOSE 5000
 
 ENTRYPOINT ["python"]
-CMD ["/root/crunchdata.py"]
+CMD ["/app.py"]
