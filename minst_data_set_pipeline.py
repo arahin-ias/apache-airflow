@@ -21,7 +21,7 @@ dag = DAG(
 
 def create_bucket():
     hook = S3Hook(aws_conn_id='aws_default')
-    hook.create_bucket(bucket_name=BUCKET_NAME, region_name='us-east-2')
+    hook.create_bucket(bucket_name=BUCKET_NAME)
 
 
 def extract_mnist_data():
