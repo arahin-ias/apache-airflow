@@ -162,8 +162,9 @@ with DAG(
                          '--total-executor-cores 12 '
                          '--driver-memory 16G '
                          '--driver-cores 12 '
-                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/target/'
-                         f'spark-flights-data-analysis-1.0-SNAPSHOT.jar '
+                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/'
+                         f'data-extract-processor/target/'
+                         f'data-extract-processor-1.0-SNAPSHOT.jar '
                          f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
                          f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data '
                          f'{spark_job_id}',
