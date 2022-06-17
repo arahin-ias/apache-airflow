@@ -14,7 +14,6 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
-BUCKET_NAME_OPERATOR = 'spark-flight-data-bucket-operator'
 BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-s3hook'
 ROOT_DIRECTORY = '/Users/arahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/filter_data/'
@@ -234,12 +233,3 @@ with DAG(
 
     create_bucket_s3_hook >> upload_files_s3_hook
 
-    upload_files_boto_3_client = PythonOperator(
-        task_id=f'upload_files_boto_3_client',
-        python_callable=upload_files,
-        op_kwargs={
-            'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
-            'bucket': BUCKET_NAME_OPERATOR},
-    )
-
-    upload_file_dummy_task >> upload_files_boto_3_client
