@@ -4,7 +4,6 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
-from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.operators.python import PythonOperator
 import glob
 import os
@@ -14,7 +13,7 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
-BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-s3hook'
+BUCKET_NAME_S3HOOK = 'arahin-spark-test-bucket'
 ROOT_DIRECTORY = '/Users/arahin'
 SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/S3UploadData/'
@@ -202,25 +201,13 @@ with DAG(
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> \
     compress_task >> create_bucket_dummy_task
 
-    create_bucket_S3_operator = S3CreateBucketOperator(
-        task_id='create_bucket_S3_operator',
-        bucket_name=BUCKET_NAME_OPERATOR,
-        region_name='us-east-1',
-    )
-
     create_bucket_s3_hook = PythonOperator(
         task_id='create_bucket_s3_hook',
         python_callable=create_bucket,
         op_kwargs={'bucket_name': BUCKET_NAME_S3HOOK}
     )
 
-    create_bucket_dummy_task >> [create_bucket_S3_operator, create_bucket_s3_hook]
-
-    upload_file_dummy_task = DummyOperator(
-        task_id='upload_file_dummy_task',
-    )
-
-    create_bucket_S3_operator >> upload_file_dummy_task
+    create_bucket_dummy_task >> [create_bucket_s3_hook]
 
     upload_files_s3_hook = PythonOperator(
         task_id='upload_files_s3_hook',
@@ -232,4 +219,3 @@ with DAG(
     )
 
     create_bucket_s3_hook >> upload_files_s3_hook
-
