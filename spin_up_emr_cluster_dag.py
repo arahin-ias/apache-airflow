@@ -12,12 +12,28 @@ import os
 import tarfile
 from pathlib import Path
 import boto3
+from airflow.providers.amazon.aws.operators.emr import EmrAddStepsOperator, EmrTerminateJobFlowOperator
+from airflow.providers.amazon.aws.sensors.emr import EmrStepSensor
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 import logging
 
-ARTIFACT_LOCATION = "/Users/arahin/sourcecode/sample-code/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar"
-SOURCE_DATA_LOCATION = "s3://arahin-spark-test-bucket/data/"
+SPARK_STEPS = [
+    {
+        'Name': 'TestSparkJob1',
+        'ActionOnFailure': 'CONTINUE',
+        'HadoopJarStep': {
+            'Jar': 'command-runner.jar',
+            'Args': [
+                'spark-submit',
+                '--class', 'org.ias.spark.dailymarting.DmsContextualEngine',
+                's3://arahin-spark-test-bucket/artifact/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar',
+                's3://arahin-spark-test-bucket/agg_small_test_data/*.gz',
+                's3://arahin-spark-test-bucket'
+            ]
+        }
+    }
+]
 
 JOB_FLOW_OVERRIDES = {
     "Name": "adnan_airflow_cluster",
@@ -70,3 +86,32 @@ with DAG(
         emr_conn_id="emr_default",
         dag=dag,
     )
+
+    step_adder = EmrAddStepsOperator(
+        task_id="add_steps",
+        job_flow_id="{{ task_instance.xcom_pull(task_ids='create_emr_cluster', key='return_value') }}",
+        aws_conn_id="aws_default",
+        steps=SPARK_STEPS,
+        dag=dag,
+    )
+
+    last_step = len(SPARK_STEPS) - 1
+
+    step_checker = EmrStepSensor(
+        task_id="watch_step",
+        job_flow_id="{{ task_instance.xcom_pull('create_emr_cluster', key='return_value') }}",
+        step_id="{{ task_instance.xcom_pull(task_ids='add_steps', key='return_value')["
+                + str(last_step)
+                + "] }}",
+        aws_conn_id="aws_default",
+        dag=dag,
+    )
+
+    terminate_emr_cluster = EmrTerminateJobFlowOperator(
+        task_id="terminate_emr_cluster",
+        job_flow_id="{{ task_instance.xcom_pull(task_ids='create_emr_cluster', key='return_value') }}",
+        aws_conn_id="aws_default",
+        dag=dag,
+    )
+
+    create_emr_cluster >> step_adder >> step_checker >> terminate_emr_cluster
