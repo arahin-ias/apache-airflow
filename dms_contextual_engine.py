@@ -22,7 +22,7 @@ LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/poc/spark-dms-contextual-pip
 
 SPARK_STEPS = [
     {
-        'Name': 'TestSparkJob1',
+        'Name': 'DmsContextualSparkJob',
         'ActionOnFailure': 'TERMINATE_CLUSTER',
         'HadoopJarStep': {
             'Jar': 'command-runner.jar',
@@ -31,7 +31,7 @@ SPARK_STEPS = [
                 '--class', 'org.ias.spark.dailymarting.DmsContextualEngine',
                 's3://arahin-spark-test-bucket/artifact/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar',
                 's3://arahin-spark-test-bucket/agg_small_test_data/*.gz',
-                's3://arahin-spark-test-bucket'
+                's3://arahin-spark-test-bucket/dms_aggregated_data'
             ]
         }
     }
