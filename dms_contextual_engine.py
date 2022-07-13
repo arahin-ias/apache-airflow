@@ -18,10 +18,12 @@ from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 import logging
 
+LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/poc/spark-dms-contextual-pipeline-poc/target/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar'
+
 SPARK_STEPS = [
     {
         'Name': 'TestSparkJob1',
-        'ActionOnFailure': 'CONTINUE',
+        'ActionOnFailure': 'TERMINATE_CLUSTER',
         'HadoopJarStep': {
             'Jar': 'command-runner.jar',
             'Args': [
@@ -74,11 +76,36 @@ JOB_FLOW_OVERRIDES = {
     },
 }
 
+
+def load_data(**context):
+    bucket_name = context['bucket_name']
+    filename = context['filename']
+    key = context['key']
+    s3hook = S3Hook(aws_conn_id='aws_default')
+    s3hook.load_file(filename=filename, bucket_name=bucket_name, replace=True, key=key)
+
+
 with DAG(
-        dag_id="create_emr_cluster",
+        dag_id="dms_contextual_engine_job",
         start_date=dt.datetime(2022, 2, 1),
         schedule_interval=None,
 ) as dag:
+    build_jar = BashOperator(
+        task_id='build_spark_jar',
+        bash_command=f'mvn clean install -f '
+                     '/Users/arahin/sourcecode/poc/spark-dms-contextual-pipeline-poc/pom.xml',
+    )
+
+    upload_artifact_to_s3 = PythonOperator(
+        task_id='upload_files_s3_hook',
+        python_callable=load_data,
+        op_kwargs={
+            'bucket_name': 'arahin-spark-test-bucket',
+            'filename': LOCAL_ARTIFACT_LOCATION,
+            'key': f'artifact/{os.path.basename(LOCAL_ARTIFACT_LOCATION)}',
+        }
+    )
+
     create_emr_cluster = EmrCreateJobFlowOperator(
         task_id="create_emr_cluster",
         job_flow_overrides=JOB_FLOW_OVERRIDES,
@@ -100,9 +127,7 @@ with DAG(
     step_checker = EmrStepSensor(
         task_id="watch_step",
         job_flow_id="{{ task_instance.xcom_pull('create_emr_cluster', key='return_value') }}",
-        step_id="{{ task_instance.xcom_pull(task_ids='add_steps', key='return_value')["
-                + str(last_step)
-                + "] }}",
+        step_id="{{ task_instance.xcom_pull(task_ids='add_steps', key='return_value')[" + str(last_step) + "] }}",
         aws_conn_id="aws_default",
         dag=dag,
     )
@@ -114,4 +139,4 @@ with DAG(
         dag=dag,
     )
 
-    create_emr_cluster >> step_adder >> step_checker >> terminate_emr_cluster
+    build_jar >> upload_artifact_to_s3 >> create_emr_cluster >> step_adder >> step_checker >> terminate_emr_cluster
