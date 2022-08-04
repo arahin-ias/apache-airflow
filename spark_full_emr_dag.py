@@ -18,7 +18,7 @@ from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 import logging
 
-LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/poc/spark-dms-contextual-pipeline-poc/target/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar'
+LOCAL_ARTIFACT_LOCATION = '/home/rahin/source-code/scala/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
 
 SPARK_STEPS = [
     {
@@ -28,7 +28,7 @@ SPARK_STEPS = [
             'Jar': 'command-runner.jar',
             'Args': [
                 'spark-submit',
-                '--class', 'org.ias.spark.dailymarting.DmsContextualEngine',
+                '--class', 'org.flight.analysis.FlightDataProcessor',
                 's3://arahin-spark-test-bucket/artifact/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar',
                 's3://arahin-spark-test-bucket/agg_small_test_data/*.gz',
                 's3://arahin-spark-test-bucket/dms_aggregated_data'
