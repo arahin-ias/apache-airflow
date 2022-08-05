@@ -19,7 +19,7 @@ from airflow.sensors.python import PythonSensor
 import logging
 import jinja2
 
-LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/arahin-spark-emr/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
+LOCAL_ARTIFACT_LOCATION = '/home/rahin/source-code/scala/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
 
 SPARK_STEPS = [
     {
@@ -61,14 +61,14 @@ JOB_FLOW_OVERRIDES = {
                 "Name": "Master node",
                 "Market": "ON_DEMAND",
                 "InstanceRole": "MASTER",
-                "InstanceType": "m5.xlarge",
+                "InstanceType": "m4.xlarge",
                 "InstanceCount": 1,
             },
             {
                 "Name": "Core - 2",
                 "Market": "ON_DEMAND",  # Spot instances are a "use as available" instances
                 "InstanceRole": "CORE",
-                "InstanceType": "m5.xlarge",
+                "InstanceType": "m4.xlarge",
                 "InstanceCount": 2,
             },
         ],
