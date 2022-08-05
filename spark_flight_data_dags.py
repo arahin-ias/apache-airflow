@@ -4,7 +4,6 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
-from airflow.providers.amazon.aws.operators.s3 import S3CreateBucketOperator
 from airflow.operators.python import PythonOperator
 import glob
 import os
@@ -14,10 +13,9 @@ import boto3
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 
-BUCKET_NAME_OPERATOR = 'spark-flight-data-bucket-operator'
-BUCKET_NAME_S3HOOK = 'spark-flight-data-bucket-s3hook'
-ROOT_DIRECTORY = '/home/rahin'
-SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data/'
+BUCKET_NAME_S3HOOK = 'arahin-spark-test-bucket'
+ROOT_DIRECTORY = '/Users/arahin'
+SOURCE_DIRECTORY = f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/filter_data/'
 DESTINATION_DIRECTORY = f'{ROOT_DIRECTORY}/S3UploadData/'
 
 transformation_data_list = ['number_of_cancelled_flights',
@@ -139,7 +137,7 @@ with DAG(
     build_jar = BashOperator(
         task_id='build_spark_jar',
         bash_command=f'mvn clean install -f '
-                     f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/pom.xml',
+                     f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/pom.xml',
     )
 
     build_jar_dummy_task = DummyOperator(
@@ -156,17 +154,17 @@ with DAG(
         submit_spark_job = BashOperator(
             task_id=f'submit_spark_job_{spark_job_id}',
             bash_command=f'spark-submit --class org.flight.analysis.FlightDataProcessor '
-                         '--master spark://ubuntu:7077 '
+                         '--master spark://192.168.1.7:7077 '
                          '--deploy-mode cluster '
-                         '--executor-memory 16G '
-                         '--total-executor-cores 12 '
-                         '--driver-memory 16G '
-                         '--driver-cores 12 '
-                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/'
+                         '--executor-memory 8G '
+                         '--total-executor-cores 8 '
+                         '--driver-memory 8G '
+                         '--driver-cores 8 '
+                         f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/'
                          f'data-extract-processor/target/'
                          f'data-extract-processor-1.0-SNAPSHOT.jar '
-                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/2015_flights_data/ '
-                         f'{ROOT_DIRECTORY}/source-code/Intellij-Project/Spark-Flights-Data-Analysis/filter_data '
+                         f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/2015_flights_data/ '
+                         f'{ROOT_DIRECTORY}/sourcecode/sample-code/Spark-Flights-Data-Analysis/filter_data '
                          f'{spark_job_id}',
         )
 
@@ -203,25 +201,13 @@ with DAG(
     spark_submit_dummy_task >> clean_output_directory >> create_directory_task >> \
     compress_task >> create_bucket_dummy_task
 
-    create_bucket_S3_operator = S3CreateBucketOperator(
-        task_id='create_bucket_S3_operator',
-        bucket_name=BUCKET_NAME_OPERATOR,
-        region_name='us-east-1',
-    )
-
     create_bucket_s3_hook = PythonOperator(
         task_id='create_bucket_s3_hook',
         python_callable=create_bucket,
         op_kwargs={'bucket_name': BUCKET_NAME_S3HOOK}
     )
 
-    create_bucket_dummy_task >> [create_bucket_S3_operator, create_bucket_s3_hook]
-
-    upload_file_dummy_task = DummyOperator(
-        task_id='upload_file_dummy_task',
-    )
-
-    create_bucket_S3_operator >> upload_file_dummy_task
+    create_bucket_dummy_task >> [create_bucket_s3_hook]
 
     upload_files_s3_hook = PythonOperator(
         task_id='upload_files_s3_hook',
@@ -233,13 +219,3 @@ with DAG(
     )
 
     create_bucket_s3_hook >> upload_files_s3_hook
-
-    upload_files_boto_3_client = PythonOperator(
-        task_id=f'upload_files_boto_3_client',
-        python_callable=upload_files,
-        op_kwargs={
-            'source_dir': f'{ROOT_DIRECTORY}/S3UploadData/',
-            'bucket': BUCKET_NAME_OPERATOR},
-    )
-
-    upload_file_dummy_task >> upload_files_boto_3_client
