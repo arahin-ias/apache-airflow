@@ -22,7 +22,7 @@ LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/arahin-spark-emr/Spark-Fligh
 
 SPARK_STEPS = [
     {
-        'Name': 'DmsContextualSparkJob',
+        'Name': 'FlightDataProcessorSparkJob',
         'ActionOnFailure': 'TERMINATE_CLUSTER',
         'HadoopJarStep': {
             'Jar': 'command-runner.jar',
