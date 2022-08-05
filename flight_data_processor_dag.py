@@ -17,6 +17,7 @@ from airflow.providers.amazon.aws.sensors.emr import EmrStepSensor
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 import logging
+import jinja2
 
 LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/arahin-spark-emr/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
 
@@ -38,7 +39,7 @@ SPARK_STEPS = [
 ]
 
 JOB_FLOW_OVERRIDES = {
-    "Name": "arahin_spark_cluster",
+    "Name": 'arahin-spark-flight-{{ ds_nodash }}-cluster', ## 'arahin-spark-flights-{{ macros.ds_format(dag_run.conf.date, "%Y/%m/%d", "%Y%m%d") }}-cluster'
     "ReleaseLabel": "emr-5.30.0",
     "Applications": [{"Name": "Hadoop"}, {"Name": "Spark"}],
     "Configurations": [
