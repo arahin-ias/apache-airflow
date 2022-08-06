@@ -19,7 +19,7 @@ from airflow.sensors.python import PythonSensor
 import logging
 import jinja2
 
-LOCAL_ARTIFACT_LOCATION = '/home/rahin/source-code/scala/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
+LOCAL_ARTIFACT_LOCATION = '/Users/arahin/sourcecode/arahin-spark-emr/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
 
 SPARK_STEPS = [
     {
