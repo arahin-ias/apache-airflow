@@ -17,29 +17,28 @@ from airflow.providers.amazon.aws.sensors.emr import EmrStepSensor
 from botocore.exceptions import ClientError
 from airflow.sensors.python import PythonSensor
 import logging
-import jinja2
 
 LOCAL_ARTIFACT_LOCATION = '/home/rahin/source-code/scala/Spark-Flights-Data-Analysis/data-extract-processor/target/data-extract-processor-1.0-SNAPSHOT.jar'
 
 SPARK_STEPS = [
     {
-        'Name': 'FlightDataProcessorSparkJob',
+        'Name': 'DmsContextualSparkJob',
         'ActionOnFailure': 'TERMINATE_CLUSTER',
         'HadoopJarStep': {
             'Jar': 'command-runner.jar',
             'Args': [
                 'spark-submit',
                 '--class', 'org.flight.analysis.FlightDataProcessor',
-                's3://arahin-spark-test-bucket/artifact/data-extract-processor-1.0-SNAPSHOT.jar',
-                's3://arahin-spark-test-bucket/data/',
-                's3://arahin-spark-test-bucket/flight_agg_data/'
+                's3://arahin-spark-test-bucket/artifact/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar',
+                's3://arahin-spark-test-bucket/agg_small_test_data/*.gz',
+                's3://arahin-spark-test-bucket/dms_aggregated_data'
             ]
         }
     }
 ]
 
 JOB_FLOW_OVERRIDES = {
-    "Name": 'arahin-spark-flight-{{ ds_nodash }}-cluster', ## 'arahin-spark-flights-{{ macros.ds_format(dag_run.conf.date, "%Y/%m/%d", "%Y%m%d") }}-cluster'
+    "Name": "adnan_airflow_cluster",
     "ReleaseLabel": "emr-5.30.0",
     "Applications": [{"Name": "Hadoop"}, {"Name": "Spark"}],
     "Configurations": [
@@ -61,14 +60,14 @@ JOB_FLOW_OVERRIDES = {
                 "Name": "Master node",
                 "Market": "ON_DEMAND",
                 "InstanceRole": "MASTER",
-                "InstanceType": "m4.xlarge",
+                "InstanceType": "m5.xlarge",
                 "InstanceCount": 1,
             },
             {
                 "Name": "Core - 2",
                 "Market": "ON_DEMAND",  # Spot instances are a "use as available" instances
                 "InstanceRole": "CORE",
-                "InstanceType": "m4.xlarge",
+                "InstanceType": "m5.xlarge",
                 "InstanceCount": 2,
             },
         ],
@@ -87,14 +86,14 @@ def load_data(**context):
 
 
 with DAG(
-        dag_id="flights_data_spark",
+        dag_id="dms_contextual_engine_job",
         start_date=dt.datetime(2022, 2, 1),
         schedule_interval=None,
 ) as dag:
     build_jar = BashOperator(
         task_id='build_spark_jar',
         bash_command=f'mvn clean install -f '
-                     '/Users/arahin/sourcecode/arahin-spark-emr/Spark-Flights-Data-Analysis/pom.xml',
+                     '/Users/arahin/sourcecode/poc/spark-dms-contextual-pipeline-poc/pom.xml',
     )
 
     upload_artifact_to_s3 = PythonOperator(
