@@ -28,7 +28,7 @@ SPARK_STEPS = [
             'Jar': 'command-runner.jar',
             'Args': [
                 'spark-submit',
-                '--class', 'org.ias.spark.dailymarting.DmsContextualEngine',
+                '--class', 'org.ias.spark.dailymarting.DmsContextualDriverEngine',
                 's3://arahin-spark-test-bucket/artifact/spark-dms-contextual-pipeline-poc-1.0-SNAPSHOT.jar',
                 's3://arahin-spark-test-bucket/agg_small_test_data/*.gz',
                 's3://arahin-spark-test-bucket/dms_aggregated_data'
@@ -86,7 +86,7 @@ def load_data(**context):
 
 
 with DAG(
-        dag_id="dms_contextual_engine_job",
+        dag_id="spark_dms_contextual_engine_job",
         start_date=dt.datetime(2022, 2, 1),
         schedule_interval=None,
 ) as dag:
