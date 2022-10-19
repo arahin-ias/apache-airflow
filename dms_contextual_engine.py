@@ -39,7 +39,7 @@ SPARK_STEPS = [
 
 JOB_FLOW_OVERRIDES = {
     "Name": "adnan_airflow_cluster",
-    "ReleaseLabel": "emr-5.30.0",
+    "ReleaseLabel": "emr-6.8.0",
     "Applications": [{"Name": "Hadoop"}, {"Name": "Spark"}],
     "Configurations": [
         {
